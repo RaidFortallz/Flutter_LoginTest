@@ -1,26 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:jawir/dashboard.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:jawir/dashboard_botnavbar.dart';
 
 void main() {
-  runApp(MaterialApp(
+  SystemChrome.setSystemUIOverlayStyle(
+   const SystemUiOverlayStyle(
+      statusBarColor: Color.fromARGB(255, 7, 108, 190),
+      statusBarBrightness: Brightness.light
+    )
+  );
+  runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     home: LoginJawir(),
   ));
 }
 
-class LoginJawir extends StatelessWidget {
-  LoginJawir({super.key});
+class LoginJawir extends StatefulWidget {
+  const LoginJawir({super.key});
 
+  @override
+  State<LoginJawir> createState() => _LoginJawirState();
+}
+
+class _LoginJawirState extends State<LoginJawir> {
   final TextEditingController lamunUsernameKosong = TextEditingController();
   final TextEditingController lamunPasswordKosong = TextEditingController();
 
-  
   final String usernameBenar = "MDimasDP";
   final String passwordBenar = "12345678";
 
+  bool _isSecurePassword = true;
+
   void _login(BuildContext context) {
     if (lamunUsernameKosong.text.isEmpty || lamunPasswordKosong.text.isEmpty) {
-      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Username dan Password harus diisi!"),
@@ -29,17 +42,15 @@ class LoginJawir extends StatelessWidget {
       );
     } else if (lamunUsernameKosong.text == usernameBenar &&
         lamunPasswordKosong.text == passwordBenar) {
-      
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Dashboard(
+          builder: (context) => DashboardBottomNavBar(
             username: lamunUsernameKosong.text,
           ),
         ),
       );
     } else {
-      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Username atau Password salah!"),
@@ -114,6 +125,7 @@ class LoginJawir extends StatelessWidget {
                           child: Text(
                             "Login",
                             style: TextStyle(
+                              fontFamily: "poppinsregular",
                               fontSize: 40,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -154,6 +166,8 @@ class LoginJawir extends StatelessWidget {
                               ),
                             ),
                             child: TextField(
+                              style:
+                                  const TextStyle(fontFamily: "poppinsregular"),
                               controller: lamunUsernameKosong,
                               textCapitalization: TextCapitalization.words,
                               decoration: InputDecoration(
@@ -163,15 +177,18 @@ class LoginJawir extends StatelessWidget {
                                 ),
                                 border: InputBorder.none,
                                 hintText: "Username",
-                                hintStyle: TextStyle(color: Colors.grey[400]),
+                                hintStyle: TextStyle(
+                                    fontFamily: "poppinsregular",
+                                    color: Colors.grey[400]),
                               ),
                             ),
                           ),
                           Container(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
-                              obscureText: true,
+                              obscureText: _isSecurePassword,
                               controller: lamunPasswordKosong,
+                              style: const TextStyle(fontFamily: "poppinsregular"),
                               decoration: InputDecoration(
                                 prefixIcon: const Icon(
                                   Icons.lock_outline,
@@ -179,7 +196,10 @@ class LoginJawir extends StatelessWidget {
                                 ),
                                 border: InputBorder.none,
                                 hintText: "Password",
-                                hintStyle: TextStyle(color: Colors.grey[400]),
+                                hintStyle: TextStyle(
+                                    fontFamily: "poppinsregular",
+                                    color: Colors.grey[400]),
+                                    suffixIcon: togglePassword(),
                               ),
                             ),
                           ),
@@ -187,38 +207,45 @@ class LoginJawir extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () => _login(context),
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color.fromRGBO(143, 148, 251, 1),
-                              Color.fromRGBO(143, 148, 251, 6),
-                            ],
+                   Bounceable(
+                        onTap: () => _login(context),
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 20),
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: const LinearGradient(colors: [
+                               Color.fromRGBO(143, 148, 251, 1),
+                               Color.fromRGBO(143, 148, 251, 6),
+                            ]
+                            
+                            ),
                           ),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            "Login",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                          child: const Center(
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                fontFamily: "poppinsregular",
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 60),
-                    const Text(
-                      "Lupa Password?",
-                      style: TextStyle(
-                        color: Color.fromRGBO(143, 148, 251, 1),
-                        fontSize: 14,
-                      ),
+                    
+                    const SizedBox(height: 50),
+                    Bounceable(
+                      onTap: (){},
+                        child: const Text(
+                          "Lupa Password?",
+                          style: TextStyle(
+                            fontFamily: "poppinsregular",
+                            color: Color.fromRGBO(143, 148, 251, 1),
+                            fontSize: 14,
+                          ),
+                        ),
                     ),
                   ],
                 ),
@@ -229,4 +256,15 @@ class LoginJawir extends StatelessWidget {
       ),
     );
   }
+
+  Widget togglePassword(){
+    return IconButton(onPressed: (){
+      setState(() {
+        _isSecurePassword = !_isSecurePassword;
+      });
+    }, icon: _isSecurePassword ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
+    color: Colors.blueAccent,
+    );
+  }
+
 }
